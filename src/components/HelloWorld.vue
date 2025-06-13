@@ -1,50 +1,64 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 interface Item {
   name: string
-  price: number
+  completed: boolean
 }
 
 const items = ref<Item[]>([
-  { name: 'たまご', price: 100 },
-  { name: 'りんご', price: 160 }
+  { name: 'たまご', completed: false},
+  { name: 'りんご', completed: true }
 ])
+
+const completedItems = computed(() => items.value.filter(item => item.completed))
+const uncompletedItems = computed(() => items.value.filter(item => !item.completed))
+
 const newItemName = ref('')
-const newItemPrice = ref(0)
 
 const addItem = () => {
-  items.value.push({ name: newItemName.value, price: newItemPrice.value })
+  items.value.push({ name: newItemName.value, completed: false})
 }
+const completedItem = (item: Item, state: boolean) => {
+  item.completed = state
+}
+
+
+
 </script>
 
 <template>
   <div>
-    <div>ItemList</div>
+    
+    <div>Uncompleted List</div>
     <ul>
-      <li v-for="item in items" :key="item.name" :class="{ over500: item.price >= 500 }">
-        <div >名前: {{ item.name }}</div>
-        <div>{{ item.price }} 円</div>
+      <li v-for="item in uncompletedItems" :key="item.name" >
+        <div >
+          名前: {{ item.name }}
+          <button @click="completedItem(item, true)">Complete</button>
+        </div>
       </li>
     </ul>
+    
     <div>
       <label>
         名前
         <input v-model="newItemName" type="text" />
       </label>
-      <label>
-        価格
-        <input v-model="newItemPrice" type="number" />
-      </label>
       <button @click="addItem">add</button>
     </div>
+    
+    <div>Completed List</div>
+    <ul>
+      <li v-for="item in completedItems" :key="item.name">
+        <div>
+          名前: {{ item.name }}
+          <button @click="completedItem(item, false)">Uncomplete</button>
+        </div>
+      </li>
+    </ul>
+
   </div>
 </template>
-
-<style>
-.over500 {
-  color: red;
-}
-</style>
 
 <style></style>
